@@ -1,13 +1,9 @@
-import streamlit as st
-st.title("Hello world")
-from time import sleep
+from flask import Flask, render_template
+app = Flask(__name__)
 
-def replace_line(file_name, line_num, text):
-    lines = open(file_name, 'r').readlines()
-    lines[line_num] = text
-    out = open(file_name, 'w')
-    out.writelines(lines)
-    out.close()
+@app.route("/")
+def hello_world():
+    return render_template("index.html")
 
 def get_complementary(color):
     color = color[1:]
@@ -17,22 +13,14 @@ def get_complementary(color):
     return comp_color
 
 def change_bg_color(color):
-    replace_line('.streamlit/config.toml', 3,f'backgroundColor="{color}"\n')
+    # Change background color
+    return
 
 def change_fg_color(color):
     comp_color = get_complementary(color)
-    replace_line('.streamlit/config.toml', 1,f'textColor="{comp_color}"\n')
-    replace_line('.streamlit/config.toml', 2,f'primaryColor="{comp_color}"\n')
+    # Change text color
+    return
 
-if st.button('Click', key="a"):
-    st.write('Clicked')
-else:
-    st.write('Not clicked')
 
-color = st.color_picker("Select a background color")
-
-if st.button('Change colors', key="change"):
-    change_bg_color(color)
-    change_fg_color(color)
-    sleep(2)
-    st.experimental_rerun()
+if __name__ == '__main__':
+   app.run()
