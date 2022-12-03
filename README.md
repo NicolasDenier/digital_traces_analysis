@@ -1,9 +1,45 @@
+---
+geometry: "left=2cm,right=2cm,top=1cm,bottom=1.5cm"
+---
+
+Nicolas Denier  
+GitHub repository: [https://github.com/NicolasDenier/digital_traces_analysis](https://github.com/NicolasDenier/digital_traces_analysis)
+
 # Digital traces Analysis
+**Small flask web application hosted on Deta and linked with Google Analytics**
 
-## Run
+## Set up
+After following Deta's tutorial to [set up a micro](https://docs.deta.sh/docs/micros/getting_started), a [Google Analytics](https://analytics.google.com/analytics/web/) account is created and linked to the deployed web application.  
 
-`flask run`
+## App
+The app is available at [https://lhkxlc.deta.dev/](https://lhkxlc.deta.dev/)   
+The home page contains some text and a link that redirect to a sub path called [click](https://lhkxlc.deta.dev/click), where there is nothing much to see.  
+![home](images/home.png){height=10%}
 
-## From
+## Analytics
+A few different sessions are opened to simulate various users:
 
-[https://docs.deta.sh/docs/micros/getting_started](https://docs.deta.sh/docs/micros/getting_started)
+| OS      | Browser | Country     |  
+|---------|---------|-------------|  
+| Linux   | Opera   | France      |  
+| Linux   | Opera   | Indonesia   |  
+| Linux   | Firefox | France      |  
+| Linux   | Chrome  | France      |  
+| Android | Opera   | France      |  
+| Android | Opera   | Netherlands |  
+
+Clicking, reloading pages, staying, for each session will leave digital traces that can be visualized on Google Analytic's dashboard.  
+It has indeed identified distinct users, without them to connect, simply by the unicity of all their digital traces combined:  
+
+![os](images/os.png){height=7%}  
+![browser](images/browser.png){height=12%}  
+![countries](images/countries.png){height=12%}  
+
+An interesting plot of real time traffic shows the number of active users, how much and when they click, and which urls are the most viewed (here the home page is loaded more times than the /click sub path).  
+
+![](images/real-time.png){width=90%}  
+
+Among the various insights available, the total activity can give a good idea of the peak hours.  
+
+![](images/total-activity.png){height=20%}
+
