@@ -1,4 +1,9 @@
 # Digital traces Analysis
-## Run
-`streamlit run app.py`
 
+## Run
+
+`flask run`
+
+## From
+
+[https://docs.deta.sh/docs/micros/getting_started](https://docs.deta.sh/docs/micros/getting_started)
