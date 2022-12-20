@@ -52,7 +52,7 @@ The python code can also write logs, because it is hosted on Deta, this is visib
 ![visor](images/visor.png)  
 
 ## Cookies
-The last link redirects to a Google OAuth page. Once logged in, it shows a cookie from google and the number of visitor of the website in the last 30 days. This data is obtained from the google analytics API.
+The last link redirects to a Google OAuth page. Once logged in, it shows a cookie from google and the number of visitor of the website in the last 30 days. This data is obtained from the Google Analytics API.
 
 ![oauth](images/oauth.png)  
 
@@ -60,4 +60,9 @@ The last link redirects to a Google OAuth page. Once logged in, it shows a cooki
 
 Unfortunately, registering the cookies in a file to keep authentication is difficult because Deta is not allowing to write files.
 
+## Environment variables
+Some secret variables are needed to interact with Google Analytics. To get them, the Google Analytics API must be enabled in a Google Cloud project, and they can be downloaded. Then, they are stored in a `.env` file (not in the repository) where they can be accessed without being exposed.   
 
+![GCloud](images/GCloud.png)  
+
+After deploying the code with `deta deploy`, when the environment variables are changed, they have to be updated in Deta too, with `deta update -e .env`.
