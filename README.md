@@ -1,6 +1,7 @@
 # Digital traces Analysis
 **Small flask web application hosted on Deta and linked with Google Analytics**
 
+# TP1
 ## Set up
 After following Deta's tutorial to [set up a micro](https://docs.deta.sh/docs/micros/getting_started), a [Google Analytics](https://analytics.google.com/analytics/web/) account is created and linked to the deployed web application.  
 
@@ -35,4 +36,28 @@ An interesting plot of real time traffic shows the number of active users, how m
 Among the various insights available, the total activity can give a good idea of the peak hours.  
 
 ![](images/total-activity.png)
+
+# TP2
+## Logger
+Another sub path is added, [logger](https://lhkxlc.deta.dev/logger). It contains a text input with a submit button and below, the user input logs, last first.  
+
+![logger](images/logger.png)  
+
+The user input is also written in the console from a JS script, and can be viewed in the developer tools:
+
+![devtools](images/devtools.png)  
+
+The python code can also write logs, because it is hosted on Deta, this is visible from their 'visor' dashboard: 
+
+![visor](images/visor.png)  
+
+## Cookies
+The last link redirects to a Google OAuth page. Once logged in, it shows a cookie from google and the number of visitor of the website in the last 30 days. This data is obtained from the google analytics API.
+
+![oauth](images/oauth.png)  
+
+![cookies](images/cookies.png)  
+
+Unfortunately, registering the cookies in a file to keep authentication is difficult because Deta is not allowing to write files.
+
 
