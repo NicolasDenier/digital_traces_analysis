@@ -2,8 +2,10 @@ from flask import Flask, redirect, url_for, render_template, url_for, request
 from markupsafe import escape # to escape user inputs and so avoid injection attacks
 import requests
 import json
+import pandas as pd
 from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
+from pytrends.request import TrendReq
 
 app = Flask(__name__)
 app.config.from_pyfile('settings.py')
@@ -53,7 +55,7 @@ prefix_google="""
 user_input=""
 
 @app.route('/', methods=["GET"])
-def hello_world():
+def home():
     display=prefix_google+render_template('home.html')
     return display
 
@@ -70,7 +72,7 @@ def logger():
     return prefix_google+render_template('logger.html', text=user_input)
 
 
-@app.route('/cookies/auth/', methods=["GET"])
+@app.route('/cookies/auth', methods=["GET"])
 def auth():
     scopes = ['https://www.googleapis.com/auth/analytics.readonly']
     auth_url = ga_auth(scopes)
@@ -106,3 +108,19 @@ def visitors():
         print(e)
     display=prefix_google+render_template('cookies.html', google_cookies=google_cookies, number_users=str(number_users))
     return display
+
+
+@app.route('/trends/', methods=["GET"])
+def trends():
+    pytrends = TrendReq(hl='fr-FR') # french language
+    #suggestions = pd.DataFrame(pytrends.suggestions(keyword='Cookie'))
+    kw_list = ["/m/021mn","/m/0d18sk"] # Cookie (food), Cookie (web)
+    cat = '0' 
+    timeframe ='today 3-m'
+    geo = '' # worldwide
+    gprop = '' # websearch
+    pytrends.build_payload(kw_list,cat,timeframe,geo,gprop)
+    data = pd.DataFrame(pytrends.interest_over_time()).reset_index()
+    data = data.rename(columns={"/m/021mn": "food", "/m/0d18sk": "web"})
+
+    return prefix_google+render_template('trends.html', labels=data["date"], values1=data["food"], values2=data["web"])
