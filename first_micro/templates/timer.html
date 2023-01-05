@@ -1,0 +1,30 @@
+<!--async functions-->
+<script src="https://unpkg.com/htmx.org@1.7.0"></script>
+<!--Chart.js-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
+<style>
+  th {
+    text-align: left;
+  }
+</style>
+<h1>Timer</h1>
+<p>
+  Monitor execution time over two counting functions, one using a python
+  dictionary and the other using the Counter function. They are counting word
+  occurences in Shakespeare's texts.
+</p>
+<h3>Using dictionnary</h3>
+Executed in <b>{{execution_times[0]}} s</b>
+<h3>Using counter</h3>
+Executed in <b>{{execution_times[1]}} s</b>
+<h3>Results (update every 10s)</h3>
+<p>Distributions of execution times (in seconds)</p>
+<p
+  hidden
+  hx-get="/process_result"
+  hx-target="#output_api"
+  hx-trigger="every 10s"
+></p>
+<p id="output_api"></p>
+<h3>Word counts</h3>
+{{table|safe}}

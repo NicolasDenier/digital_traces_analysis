@@ -2,10 +2,16 @@ from flask import Flask, redirect, url_for, render_template, url_for, request
 from markupsafe import escape # to escape user inputs and so avoid injection attacks
 import requests
 import json
+import subprocess
+#subprocess.run(["pip", "install", "pandas"]) # bypass the requirements size limit
 import pandas as pd
 from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
 from pytrends.request import TrendReq
+import time
+from string import punctuation
+from collections import Counter
+from apscheduler.schedulers.background import BackgroundScheduler
 
 app = Flask(__name__)
 app.config.from_pyfile('settings.py')
@@ -124,3 +130,89 @@ def trends():
     data = data.rename(columns={"/m/021mn": "food", "/m/0d18sk": "web"})
 
     return prefix_google+render_template('trends.html', labels=data["date"], values1=data["food"], values2=data["web"])
+
+def timer_log(function):
+    def wrapper(*args):
+        start_time = time.time()
+        function(*args)
+        execution_time = round(time.time()-start_time, 2)
+        return execution_time 
+    return wrapper
+
+counts_dict = dict()
+counter = Counter()
+
+def word_count_using_dict(words):
+    global counts_dict
+    for word in words:
+        if word in counts_dict:
+            counts_dict[word] += 1
+        else:
+            counts_dict[word] = 1
+
+def word_count_using_counter(words):
+    global counter
+    counter.update(words)
+
+@timer_log # Monitor execution time for this function
+def count_occurences(link, count_function):
+    # Stream data from link and call a count function for each line
+    r = requests.get(link, stream=True)
+    for line in r.iter_lines(decode_unicode=True):
+        if line:
+            # set line to lower case, remove punctuation and split words
+            words = line.lower().translate(str.maketrans('', '', punctuation)).split()
+            count_function(words)
+
+# Transform a python dict to an HTML table (as string)
+def dict_to_table(d):
+    table="<table>"
+    table+="<tr><th>Word</th><th>Occurences</th></tr>"
+    d = dict(sorted(d.items(), key=lambda item: item[1], reverse=True)) # sort by values
+    for key, value in d.items():
+        table+=f'<tr><td>{key}</td><td>{value}</td></tr>'
+    table +="</table>"
+    return table
+
+execution_times = [[],[]]
+def long_calculations(k):
+    global execution_times
+    shakespeare_artwork = 'https://ocw.mit.edu/ans7870/6/6.006/s08/lecturenotes/files/t8.shakespeare.txt'
+    for i in range(k):
+        execution_times[0].append(count_occurences(shakespeare_artwork, word_count_using_dict))
+        execution_times[1].append(count_occurences(shakespeare_artwork, word_count_using_counter))
+        if k != 1:
+            counts_dict = dict() # reset dict
+            counter = Counter() # reset counter
+
+
+@app.route('/process_result', methods=["GET"])
+def process_result():
+    long_calculations(1)
+    distribution_0 = dict(Counter(execution_times[0]))
+    distribution_1 = dict(Counter(execution_times[1]))
+    
+    # get values from 2 dicts to a single dataframe to lists
+    df0 = pd.DataFrame.from_dict(distribution_0, orient='index', columns=['distribution_0']).reset_index()
+    df1 = pd.DataFrame.from_dict(distribution_1, orient='index', columns=['distribution_1']).reset_index()
+    df = pd.concat([df0, df1], ignore_index=True, sort=False).groupby(['index']).sum().reset_index()
+    labels=df['index'].values.tolist() # list of unique labels in both distributions
+    values0=df['distribution_0'].astype('int').values.tolist()
+    values1=df['distribution_1'].astype('int').values.tolist()
+
+    return render_template('exec_time_distribution.html', labels=labels, values0=values0, values1=values1)
+
+@app.route('/timer', methods=["GET"])
+def timer():
+    global execution_times
+    execution_times = [[],[]] # reset execution_times on page reload
+    long_calculations(1)
+    mean_times = list(map(lambda x: round(sum(x)/len(x),2), execution_times))
+    return prefix_google+render_template('timer.html', execution_times=mean_times, table=dict_to_table(counts_dict))
+
+if __name__ == "__main__":
+    '''scheduler = BackgroundScheduler()
+    scheduler.add_job(random_num, "interval", seconds=10)
+    scheduler.start()
+    '''
+    app.run()

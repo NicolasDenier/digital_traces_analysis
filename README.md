@@ -66,3 +66,23 @@ Some secret variables are needed to interact with Google Analytics. To get them,
 ![GCloud](images/GCloud.png)  
 
 After deploying the code with `deta deploy`, when the environment variables are changed, they have to be updated in Deta too, with `deta update -e .env`.
+
+# TP3
+## GDPR
+General Data Protection Regulation (GDPR), is a european law that aims to regulate personal data uses and data privacy across all type of organisation that use this kind of sensitive data. It is applicable since May 25th, 2018. It has been put in place to avoid unethical, unfair, opaque, and possibly dangerous uses of personal data that were more and more common with the explosion of internet, in particular social medias. The former law that the GDPR replaces was called Data Protection Directive from 1995 that was outdated due to the fast evolution of internet.
+
+## Google trend
+A new endpoint is created, [`/trends`](https://lhkxlc.deta.dev/trends/), it is getting data from Google trends with pytrends and showing it with the chart.js library. The chosen trend is the searches for the word 'cookie' (in french but worldwide). The two meanings of this word (food and web cookie) are compared. A seasonal pattern can be identified, where people are more interested in the cookie food during week-ends, and at the opposite, less interested in web cookies. Also the food is way more popular than the web cookies and the searches had increased a lot with the end of the year (Christmas and new year time).  
+
+![Trend visualization in the web app](images/trends.png){width=70%}  
+
+## Timer log
+To monitor the execution time of a function, a decorator is created. The function to measure is counting the occurrences of words in Shakespeare's artwork. Two approaches are made: one function using a python dictionary, and the other one using the Counter function. To have a better comparison, the timed function are executed several times, and the execution time is stored. To avoid Deta limitations on execution timeout, the functions are executed repeatedly every 10 seconds and a distribution chart is automatically updated. Also, the word counts are displayed and the execution time of the first measurement.  
+
+![Real time update of distributions (executed locally)](images/distributions.png){width=80%}  
+
+It can be observed that the counter function seems generally more efficient (shorter execution time), but the difference is small. Figure 2 was computed locally, and the mean execution time is less than 0.9 seconds, but when executed on Deta, it is more over 3 seconds.  
+Counter is actually a subclass of dictionary optimized to count, that can explain the better performances.  
+However, on Deta, the calculations seems faster with the dictionary (Figure 3), that is difficult to explain.  
+
+![Longer when executed on Deta](images/distributions-deta.png){width=80%}  
